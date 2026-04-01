@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Sign In — nextWEEK</title>
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+body{background:var(--bg);min-height:100vh;display:flex;flex-direction:column;}
+.wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;position:relative;}
+.bg-orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;}
+.orb1{width:400px;height:400px;background:rgba(168,85,200,0.12);top:-100px;right:-100px;}
+.orb2{width:300px;height:300px;background:rgba(168,85,200,0.07);bottom:-50px;left:-50px;}
+.card{width:100%;max-width:460px;background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--pink);padding:44px;box-shadow:0 8px 40px rgba(168,85,200,0.1);animation:up .4s ease;}
+@keyframes up{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+.logo-row{text-align:center;margin-bottom:28px;}
+.logo-inner{display:inline-flex;align-items:center;gap:14px;text-decoration:none;}
+.brand-text{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;line-height:1;}
+.brand-text .n{color:var(--pink);}
+.brand-text .w{color:var(--ink);}
+.tagline{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+.tabs{display:grid;grid-template-columns:1fr 1fr;margin-bottom:28px;border:1px solid var(--border);}
+.tab{padding:13px;text-align:center;cursor:pointer;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:transparent;border:none;transition:all .2s;border-right:1px solid var(--border);}
+.tab:last-child{border-right:none;}
+.tab:hover{color:var(--pink);background:var(--pink-soft);}
+.tab.active{background:var(--pink);color:#fff;}
+.tab .ico{display:block;font-size:18px;margin-bottom:3px;}
+.tab .desc{display:block;font-size:9px;font-family:'Libre Baskerville',serif;font-style:italic;opacity:.8;margin-top:2px;text-transform:none;}
+.info-box{background:var(--pink-soft);border:1px solid var(--border);border-left:3px solid var(--pink);padding:11px 14px;margin-bottom:22px;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);line-height:1.7;}
+.info-box strong{color:var(--pink);}
+.ftitle{font-family:'Playfair Display',serif;font-style:italic;font-size:17px;color:var(--ink);margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid var(--rule);}
+.ftitle span{color:var(--pink);}
+.lf{margin-bottom:16px;}
+.lf label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:7px;}
+.lf input{width:100%;padding:12px 13px;background:var(--bg2);border:1px solid var(--border);color:var(--ink);font-family:'Libre Baskerville',serif;font-size:15px;outline:none;transition:border-color .2s;}
+.lf input:focus{border-color:var(--pink);}
+.lf input::placeholder{color:var(--muted);opacity:.5;}
+.btn{width:100%;padding:14px;background:var(--pink);color:#fff;border:none;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;}
+.btn:hover{background:var(--pink-deep);}
+.btn:disabled{opacity:.55;cursor:not-allowed;}
+.err{color:#e53e3e;font-size:12px;margin-top:10px;text-align:center;font-family:'Space Mono',monospace;background:rgba(229,62,62,.07);padding:10px;border:1px solid rgba(229,62,62,.2);display:none;}
+.links{text-align:center;margin-top:18px;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);}
+.links a{color:var(--pink);text-decoration:none;}
+.links a:hover{text-decoration:underline;}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+<div class="wrap">
+  <div class="card">
+    <div class="logo-row">
+      <a class="logo-inner" href="/">
+        <div id="logoM"></div>
+        <div>
+          <div class="brand-text"><span class="n">next</span><span class="w">WEEK</span></div>
+          <div class="tagline">Opinions that bite back</div>
+        </div>
+      </a>
+    </div>
+    <div class="tabs">
+      <button class="tab active" id="tab-reader" onclick="setRole('reader')"><span class="ico">📖</span>Reader<span class="desc">Browse &amp; read articles</span></button>
+      <button class="tab" id="tab-publisher" onclick="setRole('publisher')"><span class="ico">✍️</span>Publisher<span class="desc">Publish &amp; manage</span></button>
+    </div>
+    <div class="info-box" id="infoBox"></div>
+    <div class="ftitle">Sign in as <span id="roleLabel">Reader</span></div>
+    <div class="lf"><label>Username</label><input type="text" id="lUser" placeholder="Enter username" autocomplete="username"></div>
+    <div class="lf"><label>Password</label><input type="password" id="lPass" placeholder="••••••••" autocomplete="current-password"></div>
+    <button class="btn" id="loginBtn" onclick="doLogin()">Sign In →</button>
+    <div class="err" id="errBox"></div>
+    <div class="links" style="margin-top:14px;">
+      Not a publisher yet? <a href="/register.html">Register here →</a>
+    </div>
+    <div class="links"><a href="/">← Back to nextWEEK</a></div>
+  </div>
+</div>
+<script src="/js/api.js"></script>
+<script>
+NW.initTheme();
+document.getElementById('logoM').innerHTML = NW.logoSVG(52);
+if(NW.isLoggedIn()) location.href = NW.isPublisher() ? '/admin.html' : '/';
+
+const roleInfoMap = {
+  reader:    '<strong>Reader:</strong> Browse all articles and read full content.',
+  publisher: '<strong>Publisher:</strong> Must be approved by admin to access CMS. <a href="/register.html" style="color:var(--pink)">Register here</a> if you don\'t have an account.'
+};
+let selectedRole = 'reader';
+function setRole(r) {
+  selectedRole = r;
+  document.getElementById('tab-reader').classList.toggle('active', r==='reader');
+  document.getElementById('tab-publisher').classList.toggle('active', r==='publisher');
+  document.getElementById('roleLabel').textContent = r==='reader' ? 'Reader' : 'Publisher';
+  document.getElementById('infoBox').innerHTML = roleInfoMap[r];
+  document.getElementById('errBox').style.display='none';
+}
+setRole('reader');
+
+async function doLogin() {
+  const u = document.getElementById('lUser').value.trim();
+  const p = document.getElementById('lPass').value;
+  if(!u||!p){showErr('Please enter username and password.');return;}
+  const btn = document.getElementById('loginBtn');
+  btn.innerHTML='<span class="spin"></span> Signing in…'; btn.disabled=true;
+  document.getElementById('errBox').style.display='none';
+  try {
+    const d = await NW.login(u, p);
+    if(selectedRole==='publisher' && d.role==='reader'){NW.clearSession();showErr('This account is a Reader, not a Publisher.');return;}
+    location.href = (d.role==='admin'||d.role==='publisher') ? '/admin.html' : (new URLSearchParams(location.search).get('redirect')||'/');
+  } catch(e){ showErr(e.message); }
+  finally{ btn.innerHTML='Sign In →'; btn.disabled=false; }
+}
+function showErr(m){ const e=document.getElementById('errBox'); e.textContent=m; e.style.display='block'; }
+document.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+</script>
+</body>
+</html>

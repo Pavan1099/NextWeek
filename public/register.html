@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Register as Publisher — nextWEEK</title>
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+body{background:var(--bg);min-height:100vh;display:flex;flex-direction:column;}
+.wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+.bg-orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;}
+.orb1{width:400px;height:400px;background:rgba(168,85,200,0.1);top:-100px;right:-100px;}
+.card{width:100%;max-width:500px;background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--pink);padding:44px;box-shadow:0 8px 40px rgba(168,85,200,0.1);animation:up .4s ease;}
+@keyframes up{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+.logo-row{text-align:center;margin-bottom:24px;}
+.logo-inner{display:inline-flex;align-items:center;gap:14px;text-decoration:none;}
+.brand-text{font-family:'Playfair Display',serif;font-size:30px;font-weight:900;}
+.brand-text .n{color:var(--pink);} .brand-text .w{color:var(--ink);}
+.tagline{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+.ptitle{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;margin-bottom:6px;}
+.psub{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.03em;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--rule);}
+.notice{background:var(--pink-soft);border:1px solid var(--border);border-left:3px solid var(--pink);padding:12px 14px;margin-bottom:22px;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);line-height:1.7;}
+.notice strong{color:var(--pink);}
+.lf{margin-bottom:16px;}
+.lf label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:7px;}
+.lf label span{color:var(--pink);}
+.lf input{width:100%;padding:12px 13px;background:var(--bg2);border:1px solid var(--border);color:var(--ink);font-family:'Libre Baskerville',serif;font-size:14px;outline:none;transition:border-color .2s;}
+.lf input:focus{border-color:var(--pink);}
+.lf input::placeholder{color:var(--muted);opacity:.5;}
+/* AADHAAR DROP */
+.drop-zone{border:2px dashed var(--border);background:var(--bg2);padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
+.drop-zone:hover,.drop-zone.over{border-color:var(--pink);background:var(--pink-soft);}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.dz-icon{font-size:28px;display:block;margin-bottom:8px;}
+.dz-label{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);line-height:1.6;}
+.dz-label strong{color:var(--pink);}
+.dz-status{margin-top:10px;background:var(--pink-soft);border-left:3px solid var(--pink);padding:8px 12px;font-family:'Space Mono',monospace;font-size:11px;color:var(--pink);display:none;text-align:left;}
+.btn{width:100%;padding:14px;background:var(--pink);color:#fff;border:none;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;}
+.btn:hover{background:var(--pink-deep);}
+.btn:disabled{opacity:.55;cursor:not-allowed;}
+.err{color:#e53e3e;font-size:12px;margin-top:10px;font-family:'Space Mono',monospace;background:rgba(229,62,62,.07);padding:10px;border:1px solid rgba(229,62,62,.2);display:none;}
+.success-box{background:rgba(72,187,120,.08);border:1px solid rgba(72,187,120,.3);border-left:3px solid #48bb78;padding:20px;text-align:center;display:none;}
+.success-box h3{font-family:'Playfair Display',serif;font-style:italic;font-size:20px;color:#2f855a;margin-bottom:8px;}
+.success-box p{font-size:13px;color:var(--muted);line-height:1.7;}
+.links{text-align:center;margin-top:16px;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);}
+.links a{color:var(--pink);text-decoration:none;}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="bg-orb orb1"></div>
+<div class="wrap">
+  <div class="card">
+    <div class="logo-row">
+      <a class="logo-inner" href="/">
+        <div id="logoM"></div>
+        <div>
+          <div class="brand-text"><span class="n">next</span><span class="w">WEEK</span></div>
+          <div class="tagline">Opinions that bite back</div>
+        </div>
+      </a>
+    </div>
+
+    <div id="formSection">
+      <div class="ptitle">Become a Publisher</div>
+      <div class="psub">Register to publish articles on nextWEEK. Admin will review your application.</div>
+
+      <div class="notice">
+        <strong>Verification required:</strong> You must upload your Aadhaar card (PDF or image).
+        Your account will be <strong>pending</strong> until admin approves it.
+        You will not be able to log in until approved.
+      </div>
+
+      <div class="lf"><label>Full Name <span>*</span></label><input type="text" id="rName" placeholder="Your full name"></div>
+      <div class="lf"><label>Username <span>*</span></label><input type="text" id="rUser" placeholder="Choose a username" autocomplete="username"></div>
+      <div class="lf"><label>Password <span>*</span></label><input type="password" id="rPass" placeholder="Create a strong password" autocomplete="new-password"></div>
+
+      <div class="lf">
+        <label>Aadhaar Card <span>*</span> <small style="color:var(--muted);font-size:9px;">(PDF, JPG or PNG — max 8MB)</small></label>
+        <div class="drop-zone" id="aadhaarDrop">
+          <input type="file" id="aadhaarFile" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/*">
+          <span class="dz-icon">🪪</span>
+          <div class="dz-label">Drag &amp; drop your <strong>Aadhaar card</strong> here, or click to browse<br><small style="opacity:.6;">Stored securely. Only visible to admin.</small></div>
+          <div class="dz-status" id="aadhaarStatus"></div>
+        </div>
+      </div>
+
+      <button class="btn" id="regBtn" onclick="doRegister()">Submit Application →</button>
+      <div class="err" id="errBox"></div>
+      <div class="links">Already have an account? <a href="/login.html">Sign in →</a></div>
+    </div>
+
+    <div class="success-box" id="successBox">
+      <h3>Application Submitted!</h3>
+      <p>Your publisher registration has been received.<br>
+      An admin will review your Aadhaar and approve your account.<br>
+      Once approved, you can <a href="/login.html" style="color:var(--pink)">sign in here</a>.</p>
+    </div>
+    <div class="links"><a href="/">← Back to nextWEEK</a></div>
+  </div>
+</div>
+<script src="/js/api.js"></script>
+<script>
+NW.initTheme();
+document.getElementById('logoM').innerHTML = NW.logoSVG(48);
+
+const drop = document.getElementById('aadhaarDrop');
+const inp  = document.getElementById('aadhaarFile');
+inp.addEventListener('change', () => showFile(inp.files[0]));
+drop.addEventListener('dragover', e=>{ e.preventDefault(); drop.classList.add('over'); });
+drop.addEventListener('dragleave', ()=> drop.classList.remove('over'));
+drop.addEventListener('drop', e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer.files[0]){inp.files=e.dataTransfer.files;showFile(e.dataTransfer.files[0]);} });
+
+function showFile(f) {
+  if(!f) return;
+  const st = document.getElementById('aadhaarStatus');
+  st.style.display='block';
+  st.textContent = `✓ ${f.name}  (${(f.size/1024).toFixed(1)} KB)`;
+}
+
+async function doRegister() {
+  const name = document.getElementById('rName').value.trim();
+  const user = document.getElementById('rUser').value.trim();
+  const pass = document.getElementById('rPass').value;
+  const file = document.getElementById('aadhaarFile').files[0];
+  const err  = document.getElementById('errBox');
+  err.style.display='none';
+  if(!name){ showErr('Please enter your full name.'); return; }
+  if(!user){ showErr('Please choose a username.'); return; }
+  if(!pass||pass.length<6){ showErr('Password must be at least 6 characters.'); return; }
+  if(!file){ showErr('Please upload your Aadhaar card.'); return; }
+  const btn = document.getElementById('regBtn');
+  btn.innerHTML='<span class="spin"></span> Submitting…'; btn.disabled=true;
+  try {
+    const fd = new FormData();
+    fd.append('name', name); fd.append('username', user); fd.append('password', pass);
+    fd.append('aadhaarFile', file);
+    await NW.register(fd);
+    document.getElementById('formSection').style.display='none';
+    document.getElementById('successBox').style.display='block';
+  } catch(e){ showErr(e.message); }
+  finally{ btn.innerHTML='Submit Application →'; btn.disabled=false; }
+}
+function showErr(m){ const e=document.getElementById('errBox'); e.textContent=m; e.style.display='block'; }
+</script>
+</body>
+</html>

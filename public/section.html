@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>nextWEEK — Section</title>
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.sec-header{padding:36px 0 22px;border-bottom:3px solid var(--pink);margin-bottom:28px;}
+.sec-header h1{font-family:'Playfair Display',serif;font-size:clamp(32px,6vw,68px);font-weight:900;letter-spacing:-.02em;}
+.sec-header h1 span{color:var(--pink);}
+.sec-sub{font-family:'Playfair Display',serif;font-style:italic;font-size:15px;color:var(--muted);margin-top:6px;}
+.sec-count{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);margin-top:8px;}
+.list-item{display:grid;grid-template-columns:170px 1fr;gap:22px;padding:22px 0;border-bottom:1px solid var(--rule);cursor:pointer;text-decoration:none;color:inherit;transition:all .2s;}
+.list-item:hover{background:var(--pink-soft);padding:22px 12px;margin:0 -12px;}
+.list-thumb{height:115px;background:var(--bg2);border:1px solid var(--border);border-top:3px solid var(--pink);display:flex;align-items:center;justify-content:center;font-size:36px;overflow:hidden;}
+.list-thumb img{width:100%;height:100%;object-fit:cover;}
+.list-cat{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--pink);margin-bottom:5px;}
+.list-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;line-height:1.2;margin-bottom:7px;}
+.list-excerpt{font-size:13px;line-height:1.65;color:var(--muted);margin-bottom:8px;}
+.list-meta{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);}
+.all-secs{display:flex;flex-wrap:wrap;gap:8px;padding:22px 0;border-top:2px solid var(--pink);margin-top:28px;}
+.all-secs a{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:5px 13px;border:1px solid var(--pink);text-decoration:none;color:var(--pink);transition:all .2s;}
+.all-secs a:hover,.all-secs a.cur{background:var(--pink);color:#fff;}
+@media(max-width:700px){.list-item{grid-template-columns:1fr;}.list-thumb{height:170px;}}
+</style>
+</head>
+<body>
+<div id="mh"></div>
+<div class="page-wrap">
+  <div id="sh" class="reveal"></div>
+  <div id="al" class="reveal"><div class="loading"></div></div>
+  <div id="nl" class="reveal"></div>
+  <div class="all-secs reveal" id="as"></div>
+</div>
+<div id="ft"></div>
+<script src="/js/api.js"></script>
+<script>
+NW.initTheme();
+const section = new URLSearchParams(location.search).get('s')||'Opinion';
+document.title = `${section} — nextWEEK`;
+document.getElementById('mh').innerHTML = NW.renderMasthead(section);
+document.getElementById('ft').innerHTML = NW.renderFooter();
+document.getElementById('nl').innerHTML = NW.renderNewsletter();
+document.getElementById('as').innerHTML = NW.SECTIONS.map(s=>`<a href="${NW.sectionURL(s)}" ${s===section?'class="cur"':''}>${NW.EMOJIS[s]||''} ${s}</a>`).join('');
+document.getElementById('themeToggleBtn').textContent = NW.getTheme()==='dark'?'☀️':'🌙';
+
+async function load() {
+  const em = NW.EMOJIS[section]||'📰';
+  try {
+    const arts = await NW.fetchArticles(section);
+    document.getElementById('sh').innerHTML=`<div class="sec-header">
+      <span style="font-size:48px;display:block;margin-bottom:8px;">${em}</span>
+      <h1><span>${section}</span></h1>
+      <div class="sec-sub">All opinions, analysis &amp; commentary</div>
+      <div class="sec-count">${arts.length} article${arts.length!==1?'s':''} published</div>
+    </div>`;
+    const al=document.getElementById('al');
+    if(!arts.length){al.innerHTML=`<div class="empty-state"><h3>Nothing here yet</h3><p><a href="/login.html">Sign in as Publisher</a> to publish the first piece.</p></div>`;return;}
+    al.innerHTML=arts.map(a=>{
+      const th=a.imageUrl?`<div class="list-thumb"><img src="${a.imageUrl}" alt=""></div>`:`<div class="list-thumb">${NW.EMOJIS[a.section]||'📰'}</div>`;
+      return `<a class="list-item" href="${NW.articleURL(a.id)}">
+        ${th}
+        <div>
+          <div class="list-cat">${a.section} &nbsp;·&nbsp; ${NW.readTime(a.excerpt||'')}</div>
+          <div class="list-title">${a.title}</div>
+          <div class="list-excerpt">${NW.excerpt(a.excerpt||'',150)}</div>
+          <div class="list-meta"><strong>${a.author}</strong> &nbsp;·&nbsp; ${NW.formatDate(a.dateISO)}${a.tags?.length?' &nbsp;·&nbsp; '+a.tags.slice(0,3).join(', '):''}</div>
+        </div>
+      </a>`;
+    }).join('');
+    NW.initReveal();
+  } catch(e){document.getElementById('al').innerHTML=`<div class="empty-state"><h3>Error</h3><p>${e.message}</p></div>`;}
+}
+NW.initTicker(); load();
+</script>
+</body>
+</html>

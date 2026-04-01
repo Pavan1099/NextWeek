@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CMS — nextWEEK</title>
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+body{background:#0a0612;}
+body::before{display:none;}
+[data-theme="light"] body,[data-theme="light"]{background:#f5f0ff;}
+
+.shell{min-height:100vh;display:flex;flex-direction:column;}
+/* TOPBAR */
+.topbar{background:#100820;border-bottom:2px solid rgba(168,85,200,.3);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;flex-shrink:0;}
+.top-brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+.top-brand-text{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:#f0e8ff;}
+.top-brand-text span{color:#a855c8;}
+.top-brand small{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(168,85,200,.5);margin-left:6px;}
+.top-right{display:flex;gap:8px;align-items:center;}
+.top-user{font-family:'Space Mono',monospace;font-size:10px;color:#a855c8;letter-spacing:.04em;}
+.tb{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:6px 13px;border:none;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;}
+.tb-g{background:transparent;color:rgba(168,85,200,.6);border:1px solid rgba(168,85,200,.25);}
+.tb-g:hover{background:rgba(168,85,200,.1);color:#a855c8;border-color:#a855c8;}
+.tb-d{background:transparent;color:#f87171;border:1px solid rgba(248,113,113,.35);}
+.tb-d:hover{background:rgba(248,113,113,.1);}
+.tb-p{background:#a855c8;color:#fff;}
+.tb-p:hover{background:#8b3faa;}
+
+/* BODY */
+.body{display:grid;grid-template-columns:210px 1fr;flex:1;min-height:calc(100vh - 56px);}
+.sidebar{background:#0c0918;border-right:1px solid rgba(168,85,200,.15);padding:18px 0;overflow-y:auto;}
+.ml{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(168,85,200,.25);padding:0 16px 6px;margin-top:18px;}
+.mi{display:flex;align-items:center;gap:9px;padding:10px 16px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.04em;color:rgba(168,85,200,.45);cursor:pointer;transition:all .15s;border-left:3px solid transparent;}
+.mi:hover{background:rgba(168,85,200,.06);color:#a855c8;}
+.mi.active{background:rgba(168,85,200,.1);color:#a855c8;border-left-color:#a855c8;}
+.mi .ico{font-size:14px;}
+.mi .badge-count{margin-left:auto;background:#a855c8;color:#fff;font-size:9px;padding:1px 6px;border-radius:10px;font-family:'Space Mono',monospace;}
+
+/* MAIN */
+.main{background:#0e0b1a;padding:28px;overflow-y:auto;}
+.panel{display:none;animation:up .3s ease;}
+.panel.active{display:block;}
+@keyframes up{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+.ptitle{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:#f0e8ff;margin-bottom:4px;}
+.ptitle span{color:#a855c8;}
+.psub{font-family:'Space Mono',monospace;font-size:11px;color:rgba(168,85,200,.35);letter-spacing:.03em;margin-bottom:24px;}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.sc{background:#130e20;border:1px solid rgba(168,85,200,.18);border-top:3px solid #a855c8;padding:16px;}
+.sn{font-family:'Playfair Display',serif;font-size:34px;font-weight:900;color:#a855c8;line-height:1;}
+.sl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(168,85,200,.35);margin-top:5px;}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(168,85,200,.35);text-align:left;padding:9px 11px;border-bottom:1px solid rgba(168,85,200,.12);}
+.tbl td{padding:12px 11px;border-bottom:1px solid rgba(168,85,200,.07);font-size:13px;color:#c0a8e0;vertical-align:middle;}
+.tbl tr:hover td{background:rgba(168,85,200,.04);}
+.tt{font-family:'Playfair Display',serif;font-weight:700;color:#f0e8ff;font-size:14px;}
+.tc{font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;color:#a855c8;}
+.acts{display:flex;gap:5px;flex-wrap:wrap;}
+.act{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.05em;text-transform:uppercase;padding:5px 9px;border:none;cursor:pointer;transition:opacity .2s;}
+.act:hover{opacity:.75;}
+.no-rows{text-align:center;padding:44px;color:rgba(168,85,200,.25);font-family:'Space Mono',monospace;font-size:12px;}
+
+/* APPROVALS */
+.approval-card{background:#130e20;border:1px solid rgba(168,85,200,.2);border-left:3px solid #a855c8;padding:18px;margin-bottom:14px;}
+.approval-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#f0e8ff;margin-bottom:4px;}
+.approval-meta{font-family:'Space Mono',monospace;font-size:10px;color:rgba(168,85,200,.5);margin-bottom:14px;}
+.approval-aadhaar{display:flex;align-items:center;gap:10px;background:rgba(168,85,200,.08);padding:10px 14px;margin-bottom:14px;font-family:'Space Mono',monospace;font-size:11px;color:#a855c8;}
+.approval-aadhaar a{color:#a855c8;text-decoration:none;font-weight:700;}
+.approval-aadhaar a:hover{text-decoration:underline;}
+.approval-acts{display:flex;gap:10px;}
+.appr-btn{padding:9px 20px;border:none;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.appr-btn.approve{background:#a855c8;color:#fff;}
+.appr-btn.approve:hover{background:#8b3faa;}
+.appr-btn.reject{background:transparent;color:#f87171;border:1px solid rgba(248,113,113,.4);}
+.appr-btn.reject:hover{background:rgba(248,113,113,.1);}
+.status-pill{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;display:inline-block;}
+.s-approved{background:#a855c8;color:#fff;}
+.s-pending{background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.3);}
+.s-rejected{background:rgba(248,113,113,.1);color:#f87171;border:1px solid rgba(248,113,113,.3);}
+
+/* FORM */
+.fsec{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#a855c8;margin:22px 0 12px;padding-bottom:7px;border-bottom:1px solid rgba(168,85,200,.18);}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.ff2{}
+.ff2 label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(168,85,200,.55);display:block;margin-bottom:7px;}
+.ff2 label span{color:#a855c8;}
+.fi{width:100%;padding:10px 12px;background:rgba(168,85,200,.07);border:1px solid rgba(168,85,200,.18);color:#f0e8ff;font-family:'Libre Baskerville',serif;font-size:14px;outline:none;transition:border-color .2s;}
+.fi:focus{border-color:#a855c8;}
+.fi::placeholder{color:rgba(168,85,200,.2);}
+.fi-sel{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%23a855c8'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;}
+.fi-sel option{background:#130e20;}
+.fi-ta{min-height:250px;resize:vertical;line-height:1.7;}
+.fful{grid-column:1/-1;}
+.drop{border:2px dashed rgba(168,85,200,.2);background:rgba(168,85,200,.04);padding:24px 18px;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
+.drop:hover,.drop.over{border-color:#a855c8;background:rgba(168,85,200,.1);}
+.drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.dz-ico{font-size:26px;display:block;margin-bottom:7px;}
+.dz-lbl{font-family:'Space Mono',monospace;font-size:11px;color:rgba(168,85,200,.45);}
+.dz-lbl strong{color:#a855c8;}
+.dz-st{margin-top:10px;background:rgba(168,85,200,.1);border-left:3px solid #a855c8;padding:8px 12px;font-family:'Space Mono',monospace;font-size:11px;color:#a855c8;display:none;text-align:left;}
+.img-prev{max-width:100%;max-height:160px;object-fit:contain;margin-top:10px;border:1px solid rgba(168,85,200,.2);display:none;}
+.fa{display:flex;gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid rgba(168,85,200,.12);}
+.f-sub{padding:12px 28px;background:#a855c8;color:#fff;border:none;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .2s;display:flex;align-items:center;gap:7px;}
+.f-sub:hover{background:#8b3faa;}
+.f-sub:disabled{opacity:.5;cursor:not-allowed;}
+.f-can{padding:12px 20px;background:transparent;color:rgba(168,85,200,.45);border:1px solid rgba(168,85,200,.18);font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.f-can:hover{border-color:#a855c8;color:#a855c8;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:#100820;color:#f0e8ff;font-family:'Space Mono',monospace;font-size:12px;padding:12px 20px;border-left:3px solid #a855c8;display:none;animation:up .3s ease;max-width:360px;box-shadow:0 4px 24px rgba(168,85,200,.2);}
+.toast.err{border-left-color:#f87171;}
+.toast.ok{border-left-color:#4ade80;}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ACCESS GATE */
+.gate{display:none;min-height:100vh;background:#0a0612;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:40px;}
+.gate h2{font-family:'Playfair Display',serif;font-size:30px;font-weight:900;color:#a855c8;margin:18px 0 10px;}
+.gate p{font-family:'Space Mono',monospace;font-size:12px;color:rgba(168,85,200,.5);margin-bottom:22px;}
+
+@media(max-width:900px){
+  .body{grid-template-columns:1fr;}
+  .sidebar{display:flex;flex-wrap:wrap;padding:8px;border-right:none;border-bottom:1px solid rgba(168,85,200,.12);}
+  .ml{display:none;}
+  .mi{padding:7px 10px;border-left:none;border-bottom:3px solid transparent;flex-direction:column;font-size:9px;align-items:center;}
+  .mi.active{border-bottom-color:#a855c8;border-left:none;}
+  .stats{grid-template-columns:1fr 1fr;}
+  .fg{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <div id="gLogoM"></div>
+  <h2>Publisher Access Only</h2>
+  <p>You need a Publisher or Admin account to access the CMS.</p>
+  <a href="/login.html" style="background:#a855c8;color:#fff;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:11px 26px;text-decoration:none;">Sign In →</a>
+</div>
+
+<div class="shell" id="shell" style="display:none;">
+  <div class="topbar">
+    <a class="top-brand" href="/">
+      <div id="tLogoM"></div>
+      <div class="top-brand-text"><span>next</span>WEEK <small>CMS</small></div>
+    </a>
+    <div class="top-right">
+      <span class="top-user" id="topUser"></span>
+      <a href="/" target="_blank" class="tb tb-g">← Site</a>
+      <button class="tb tb-d" onclick="NW.logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="body">
+    <aside class="sidebar">
+      <div class="ml">Content</div>
+      <div class="mi active" id="nav-dash"  onclick="go('dash')"><span class="ico">📊</span> Dashboard</div>
+      <div class="mi"        id="nav-new"   onclick="go('new')"><span class="ico">✍️</span> New Article</div>
+      <div class="mi"        id="nav-arts"  onclick="go('arts')"><span class="ico">📰</span> All Articles</div>
+      <div class="ml">Files</div>
+      <div class="mi"        id="nav-files" onclick="go('files')"><span class="ico">📁</span> .txt Files</div>
+      <div class="ml">Team</div>
+      <!-- Approvals tab — shown only to admin -->
+      <div class="mi" id="nav-appr" onclick="go('appr')" style="display:none;">
+        <span class="ico">✅</span> Approvals
+        <span class="badge-count" id="apprBadge" style="display:none;">0</span>
+      </div>
+      <div class="mi" id="nav-users" onclick="go('users')"><span class="ico">👥</span> Users</div>
+    </aside>
+
+    <main class="main">
+
+      <!-- DASHBOARD -->
+      <div class="panel active" id="panel-dash">
+        <div class="ptitle">Dashboard</div>
+        <div class="psub" id="dashDate"></div>
+        <div class="stats" id="statsRow"></div>
+        <div style="color:rgba(168,85,200,.3);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;">Recent Publications</div>
+        <div id="dashRecent"></div>
+      </div>
+
+      <!-- NEW ARTICLE -->
+      <div class="panel" id="panel-new">
+        <div class="ptitle">New <span>Article</span></div>
+        <div class="psub">Upload a .txt file to auto-fill the body.</div>
+        <div class="fsec">Identity</div>
+        <div class="fg">
+          <div class="ff2 fful"><label>Title <span>*</span></label><input class="fi" id="aTitle" type="text" placeholder="Article headline…"></div>
+          <div class="ff2"><label>Author <span>*</span></label><input class="fi" id="aAuthor" type="text" placeholder="Author full name"></div>
+          <div class="ff2"><label>Section <span>*</span></label><select class="fi fi-sel" id="aSection"><option value="">— Choose —</option></select></div>
+          <div class="ff2 fful"><label>Tags <small style="color:rgba(168,85,200,.3);">(comma-separated)</small></label><input class="fi" id="aTags" type="text" placeholder="Food Policy, Opinion, India"></div>
+        </div>
+        <div class="fsec">Article Body</div>
+        <div class="fg">
+          <div class="ff2 fful">
+            <label>Upload .txt File <small style="color:rgba(168,85,200,.3);">(auto-fills body + saved to /articles/)</small></label>
+            <div class="drop" id="txtDrop"><input type="file" id="txtFI" accept=".txt,text/plain"><span class="dz-ico">📄</span><div class="dz-lbl">Drop your <strong>.txt file</strong> here or click to browse</div><div class="dz-st" id="txtSt"></div></div>
+          </div>
+          <div class="ff2 fful"><label>Article Body <span>*</span></label><textarea class="fi fi-ta" id="aBody" placeholder="Type or paste. Blank lines = paragraphs."></textarea></div>
+        </div>
+        <div class="fsec">Cover Image (optional)</div>
+        <div class="fg">
+          <div class="ff2 fful">
+            <label>Image <small style="color:rgba(168,85,200,.3);">(JPG/PNG/WEBP — saved to /uploads/)</small></label>
+            <div class="drop" id="imgDrop"><input type="file" id="imgFI" accept="image/*"><span class="dz-ico">🖼️</span><div class="dz-lbl">Drop image here or click to browse</div><img class="img-prev" id="imgPrev" alt=""></div>
+          </div>
+        </div>
+        <div class="fa">
+          <button class="f-sub" id="pubBtn" onclick="publish()">Publish Article →</button>
+          <button class="f-can" onclick="clearForm()">Clear</button>
+          <button class="f-can" onclick="go('arts')">Cancel</button>
+        </div>
+      </div>
+
+      <!-- ALL ARTICLES -->
+      <div class="panel" id="panel-arts">
+        <div class="ptitle">All <span>Articles</span></div>
+        <div class="psub" id="artsCount"></div>
+        <div style="margin-bottom:14px;"><button class="tb tb-p" onclick="go('new')">+ New Article</button></div>
+        <table class="tbl"><thead><tr><th>Title</th><th>Section</th><th>Author</th><th>Date</th><th>.txt</th><th>Actions</th></tr></thead><tbody id="artsTB"></tbody></table>
+      </div>
+
+      <!-- TXT FILES -->
+      <div class="panel" id="panel-files">
+        <div class="ptitle">.txt <span>Files</span></div>
+        <div class="psub">All uploaded article text files in <code style="background:rgba(168,85,200,.1);padding:2px 6px;color:#a855c8;">/articles/</code></div>
+        <div id="filesList"><div class="loading"></div></div>
+      </div>
+
+      <!-- APPROVALS (admin only) -->
+      <div class="panel" id="panel-appr">
+        <div class="ptitle">Publisher <span>Approvals</span></div>
+        <div class="psub">Review Aadhaar documents and approve or reject publisher registrations.</div>
+        <div id="apprList"><div class="loading"></div></div>
+      </div>
+
+      <!-- USERS -->
+      <div class="panel" id="panel-users">
+        <div class="ptitle">Team <span>Users</span></div>
+        <div class="psub">Manage all accounts.</div>
+        <div style="background:rgba(168,85,200,.06);border:1px solid rgba(168,85,200,.15);padding:18px;margin-bottom:22px;">
+          <div class="fsec" style="margin-top:0;">Add New User</div>
+          <div class="fg">
+            <div class="ff2"><label>Username</label><input class="fi" id="nUser" type="text" placeholder="username"></div>
+            <div class="ff2"><label>Password</label><input class="fi" id="nPass" type="password" placeholder="password"></div>
+            <div class="ff2"><label>Full Name</label><input class="fi" id="nName" type="text" placeholder="Display name"></div>
+            <div class="ff2"><label>Role</label><select class="fi fi-sel" id="nRole"><option value="reader">📖 Reader</option><option value="publisher">✍️ Publisher</option></select></div>
+          </div>
+          <div style="margin-top:12px;"><button class="f-sub" onclick="addUser()">Add User</button></div>
+        </div>
+        <table class="tbl"><thead><tr><th>Username</th><th>Name</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead><tbody id="usersTB"></tbody></table>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/js/api.js"></script>
+<script>
+NW.initTheme();
+
+// ── ACCESS ──
+function checkAccess() {
+  if(!NW.isLoggedIn()){location.href='/login.html?redirect=/admin.html';return false;}
+  if(!NW.isPublisher()){
+    document.getElementById('gate').style.display='flex';
+    document.getElementById('gLogoM').innerHTML = NW.logoSVG(72);
+    return false;
+  }
+  return true;
+}
+
+function initAdmin() {
+  document.getElementById('shell').style.display='flex';
+  document.getElementById('tLogoM').innerHTML = NW.logoSVG(32);
+  document.getElementById('topUser').textContent = `◆ ${NW.getName()}`;
+
+  const sel=document.getElementById('aSection');
+  NW.SECTIONS.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=`${NW.EMOJIS[s]||''} ${s}`;sel.appendChild(o);});
+  setupDrops();
+
+  // Show approvals tab only for admin
+  if(NW.isAdmin()){
+    document.getElementById('nav-appr').style.display='flex';
+    loadApprBadge();
+  }
+  loadDash();
+}
+
+// ── PANELS ──
+function go(name) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.mi').forEach(i=>i.classList.remove('active'));
+  document.getElementById(`panel-${name}`).classList.add('active');
+  document.getElementById(`nav-${name}`)?.classList.add('active');
+  if(name==='dash')  loadDash();
+  if(name==='arts')  loadArts();
+  if(name==='files') loadFiles();
+  if(name==='appr')  loadAppr();
+  if(name==='users') loadUsers();
+}
+
+// ── DASHBOARD ──
+async function loadDash() {
+  document.getElementById('dashDate').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  try {
+    const [stats,arts] = await Promise.all([NW.fetchStats(),NW.fetchArticles()]);
+    document.getElementById('statsRow').innerHTML=`
+      <div class="sc"><div class="sn">${stats.totalArticles}</div><div class="sl">Articles</div></div>
+      <div class="sc"><div class="sn">${stats.totalAuthors}</div><div class="sl">Contributors</div></div>
+      <div class="sc"><div class="sn">${stats.txtFilesOnDisk}</div><div class="sl">.txt Files</div></div>
+      <div class="sc"><div class="sn" style="${stats.pendingApprovals>0?'color:#fbbf24':''}">${stats.pendingApprovals}</div><div class="sl">Pending Approvals</div></div>`;
+    const r=arts.slice(0,5);
+    document.getElementById('dashRecent').innerHTML = r.length
+      ? `<table class="tbl"><thead><tr><th>Title</th><th>Section</th><th>Date</th><th></th></tr></thead><tbody>
+          ${r.map(a=>`<tr><td><div class="tt">${a.title}</div></td><td><div class="tc">${a.section}</div></td>
+          <td style="font-family:'Space Mono',monospace;font-size:10px;color:rgba(168,85,200,.35);">${NW.formatDate(a.dateISO)}</td>
+          <td><a href="${NW.articleURL(a.id)}" target="_blank" style="font-family:'Space Mono',monospace;font-size:10px;color:#a855c8;">View →</a></td></tr>`).join('')}
+        </tbody></table>`
+      : `<div class="no-rows">No articles yet. <span style="color:#a855c8;cursor:pointer;" onclick="go('new')">Publish →</span></div>`;
+    if(stats.pendingApprovals>0){
+      document.getElementById('apprBadge').textContent=stats.pendingApprovals;
+      document.getElementById('apprBadge').style.display='inline-block';
+    }
+  } catch(e){toast(e.message,'err');}
+}
+
+// ── ARTICLES ──
+async function loadArts() {
+  try {
+    const arts = await NW.fetchArticles();
+    document.getElementById('artsCount').textContent=`${arts.length} article${arts.length!==1?'s':''} published`;
+    const tb=document.getElementById('artsTB');
+    if(!arts.length){tb.innerHTML=`<tr><td colspan="6" class="no-rows">None yet. <span style="color:#a855c8;cursor:pointer;" onclick="go('new')">Publish →</span></td></tr>`;return;}
+    tb.innerHTML=arts.map(a=>`<tr>
+      <td><div class="tt">${a.title}</div><div style="font-family:'Space Mono',monospace;font-size:10px;color:rgba(168,85,200,.3);margin-top:2px;">${NW.excerpt(a.excerpt||'',50)}</div></td>
+      <td><div class="tc">${a.section}</div></td>
+      <td style="font-family:'Space Mono',monospace;font-size:11px;color:rgba(168,85,200,.55);">${a.author}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:10px;color:rgba(168,85,200,.3);white-space:nowrap;">${NW.formatDate(a.dateISO)}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:10px;color:rgba(168,85,200,.3);">${a.txtFileName||'—'}</td>
+      <td><div class="acts">
+        <a href="${NW.articleURL(a.id)}" target="_blank" class="act" style="background:#a855c8;color:#fff;">View</a>
+        <button class="act" style="background:rgba(248,113,113,.1);color:#f87171;border:1px solid rgba(248,113,113,.25);" onclick="delArt('${a.id}','${a.title.replace(/'/g,"\\'")}')">Delete</button>
+      </div></td>
+    </tr>`).join('');
+  } catch(e){toast(e.message,'err');}
+}
+
+// ── TXT FILES ──
+async function loadFiles() {
+  document.getElementById('filesList').innerHTML='<div class="loading"></div>';
+  try {
+    const files=await NW.fetchTxtFiles();
+    if(!files.length){document.getElementById('filesList').innerHTML=`<div class="no-rows">No .txt files yet.</div>`;return;}
+    document.getElementById('filesList').innerHTML=`<div style="border:1px solid rgba(168,85,200,.18);">
+      ${files.map(f=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid rgba(168,85,200,.08);">
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:12px;color:#f0e8ff;">📄 ${f.filename}</div>
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:rgba(168,85,200,.35);margin-top:2px;">${(f.size/1024).toFixed(1)} KB · ${new Date(f.modified).toLocaleDateString('en-IN')}</div>
+        </div>
+        <button style="font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;padding:5px 12px;background:transparent;border:1px solid #a855c8;color:#a855c8;cursor:pointer;" onclick="loadTxtIntoForm('${f.filename}')">Use →</button>
+      </div>`).join('')}
+    </div>`;
+  } catch(e){toast(e.message,'err');}
+}
+async function loadTxtIntoForm(fn) {
+  try {
+    const text=await NW.fetchTxtContent(fn);
+    document.getElementById('aBody').value=text;
+    const fl=text.split('\n')[0].trim().replace(/^[#*\-]+\s*/,'');
+    if(fl&&!document.getElementById('aTitle').value) document.getElementById('aTitle').value=fl;
+    const st=document.getElementById('txtSt'); st.style.display='block'; st.textContent=`✓ Loaded: ${fn} (${text.split(/\s+/).length} words)`;
+    go('new'); toast(`Loaded ${fn}`,'ok');
+  } catch(e){toast('Could not load: '+e.message,'err');}
+}
+
+// ── APPROVALS ──
+async function loadApprBadge() {
+  try {
+    const p=await NW.fetchPending();
+    const badge=document.getElementById('apprBadge');
+    if(p.length>0){badge.textContent=p.length;badge.style.display='inline-block';}
+    else badge.style.display='none';
+  } catch{}
+}
+async function loadAppr() {
+  document.getElementById('apprList').innerHTML='<div class="loading"></div>';
+  try {
+    const pending=await NW.fetchPending();
+    if(!pending.length){
+      document.getElementById('apprList').innerHTML=`<div class="no-rows" style="padding:40px;text-align:center;">
+        <div style="font-size:40px;margin-bottom:12px;">✅</div>
+        <div style="font-family:'Space Mono',monospace;font-size:12px;color:rgba(168,85,200,.4);">No pending approvals. All clear!</div>
+      </div>`;
+      return;
+    }
+    document.getElementById('apprList').innerHTML = pending.map(u=>`
+      <div class="approval-card" id="ac-${u.id}">
+        <div class="approval-name">${u.name}</div>
+        <div class="approval-meta">
+          Username: <strong style="color:#f0e8ff;">@${u.username}</strong> &nbsp;·&nbsp;
+          Registered: ${NW.formatDate(u.registeredAt)} &nbsp;·&nbsp;
+          Role applied for: <strong style="color:#a855c8;">Publisher</strong>
+        </div>
+        ${u.aadhaarFile
+          ? `<div class="approval-aadhaar">🪪 Aadhaar: <a href="/aadhaar/${u.aadhaarFile}" target="_blank">${u.aadhaarFile}</a> &nbsp;(click to view/download)</div>`
+          : `<div class="approval-aadhaar" style="color:rgba(248,113,113,.7);">⚠ No Aadhaar file uploaded</div>`
+        }
+        <div class="approval-acts">
+          <button class="appr-btn approve" onclick="approveUser('${u.id}')">✓ Approve</button>
+          <button class="appr-btn reject"  onclick="rejectUser('${u.id}')">✕ Reject</button>
+        </div>
+      </div>`).join('');
+  } catch(e){toast(e.message,'err');}
+}
+async function approveUser(id) {
+  try {
+    await NW.approveUser(id);
+    toast('Publisher approved! They can now log in.','ok');
+    document.getElementById(`ac-${id}`)?.remove();
+    loadApprBadge();
+    const list=document.getElementById('apprList');
+    if(!list.querySelector('.approval-card')) list.innerHTML=`<div class="no-rows" style="padding:40px;text-align:center;"><div style="font-size:40px;margin-bottom:12px;">✅</div><div style="font-family:'Space Mono',monospace;font-size:12px;color:rgba(168,85,200,.4);">All clear!</div></div>`;
+  } catch(e){toast(e.message,'err');}
+}
+async function rejectUser(id) {
+  if(!confirm('Reject this publisher application?')) return;
+  try { await NW.rejectUser(id); toast('Application rejected.','ok'); loadAppr(); loadApprBadge(); }
+  catch(e){toast(e.message,'err');}
+}
+
+// ── USERS TABLE ──
+async function loadUsers() {
+  try {
+    const users=await NW.fetchUsers();
+    const tb=document.getElementById('usersTB');
+    if(!users.length){tb.innerHTML=`<tr><td colspan="5" class="no-rows">No users.</td></tr>`;return;}
+    tb.innerHTML=users.map(u=>`<tr>
+      <td style="font-family:'Space Mono',monospace;font-size:12px;color:#f0e8ff;">@${u.username}</td>
+      <td style="font-size:13px;color:rgba(168,85,200,.65);">${u.name||'—'}</td>
+      <td><span class="status-pill s-${u.role==='admin'?'approved':u.role==='publisher'?'approved':'pending'}" style="background:${u.role==='admin'?'#a855c8':u.role==='publisher'?'#7c3aed':'rgba(168,85,200,.2)'};color:${u.role==='reader'?'#a855c8':'#fff'};">${u.role}</span></td>
+      <td><span class="status-pill s-${u.status}">${u.status||'approved'}</span></td>
+      <td>${u.role!=='admin'?`<button class="act" style="background:rgba(248,113,113,.1);color:#f87171;border:1px solid rgba(248,113,113,.25);font-size:9px;padding:4px 8px;" onclick="delUser('${u.id}','${u.username}')">Remove</button>`:'<span style="color:rgba(168,85,200,.25);font-size:11px;">—</span>'}</td>
+    </tr>`).join('');
+  } catch(e){toast(e.message,'err');}
+}
+async function addUser() {
+  const u=document.getElementById('nUser').value.trim(), p=document.getElementById('nPass').value,
+        n=document.getElementById('nName').value.trim(), r=document.getElementById('nRole').value;
+  if(!u||!p){toast('Username and password required.','err');return;}
+  try { await NW.createUser({username:u,password:p,role:r,name:n}); toast(`User @${u} created.`,'ok'); ['nUser','nPass','nName'].forEach(id=>document.getElementById(id).value=''); loadUsers(); }
+  catch(e){toast(e.message,'err');}
+}
+async function delUser(id,u) {
+  if(!confirm(`Remove @${u}?`)) return;
+  try { await NW.deleteUser(id); toast('User removed.','ok'); loadUsers(); }
+  catch(e){toast(e.message,'err');}
+}
+
+// ── DROP ZONES ──
+function setupDrops() {
+  const tI=document.getElementById('txtFI'), tD=document.getElementById('txtDrop');
+  tI.addEventListener('change',()=>handleTxt(tI.files[0]));
+  tD.addEventListener('dragover',e=>{e.preventDefault();tD.classList.add('over');});
+  tD.addEventListener('dragleave',()=>tD.classList.remove('over'));
+  tD.addEventListener('drop',e=>{e.preventDefault();tD.classList.remove('over');if(e.dataTransfer.files[0])handleTxt(e.dataTransfer.files[0]);});
+  const iI=document.getElementById('imgFI'), iD=document.getElementById('imgDrop');
+  iI.addEventListener('change',()=>handleImg(iI.files[0]));
+  iD.addEventListener('dragover',e=>{e.preventDefault();iD.classList.add('over');});
+  iD.addEventListener('dragleave',()=>iD.classList.remove('over'));
+  iD.addEventListener('drop',e=>{e.preventDefault();iD.classList.remove('over');if(e.dataTransfer.files[0])handleImg(e.dataTransfer.files[0]);});
+}
+function handleTxt(f){if(!f)return;const r=new FileReader();r.onload=e=>{document.getElementById('aBody').value=e.target.result;const fl=e.target.result.split('\n')[0].trim().replace(/^[#*\-]+\s*/,'');if(fl&&!document.getElementById('aTitle').value)document.getElementById('aTitle').value=fl;const st=document.getElementById('txtSt');st.style.display='block';st.textContent=`✓ ${f.name} — ${e.target.result.split(/\s+/).length} words`;};r.readAsText(f);}
+function handleImg(f){if(!f)return;const r=new FileReader();r.onload=e=>{const p=document.getElementById('imgPrev');p.src=e.target.result;p.style.display='block';};r.readAsDataURL(f);}
+
+// ── PUBLISH ──
+async function publish() {
+  const title=document.getElementById('aTitle').value.trim(), author=document.getElementById('aAuthor').value.trim(),
+        section=document.getElementById('aSection').value, body=document.getElementById('aBody').value.trim(),
+        tags=document.getElementById('aTags').value.trim();
+  if(!title){toast('Please enter a title.','err');return;}
+  if(!author){toast('Please enter an author.','err');return;}
+  if(!section){toast('Please choose a section.','err');return;}
+  if(!body){toast('Please add article body.','err');return;}
+  const fd=new FormData();
+  fd.append('title',title);fd.append('author',author);fd.append('section',section);fd.append('tags',tags);fd.append('body',body);
+  const tf=document.getElementById('txtFI').files[0]; if(tf)fd.append('txtFile',tf);
+  const img=document.getElementById('imgFI').files[0]; if(img)fd.append('imageFile',img);
+  const btn=document.getElementById('pubBtn'); btn.innerHTML='<span class="spin"></span> Publishing…'; btn.disabled=true;
+  try { await NW.publishArticle(fd); toast(`✓ "${title}" published!`,'ok'); clearForm(); go('arts'); }
+  catch(e){toast('Failed: '+e.message,'err');}
+  finally{btn.innerHTML='Publish Article →'; btn.disabled=false;}
+}
+function clearForm(){['aTitle','aAuthor','aBody','aTags'].forEach(id=>document.getElementById(id).value='');document.getElementById('aSection').value='';document.getElementById('txtSt').style.display='none';const p=document.getElementById('imgPrev');p.style.display='none';p.src='';document.getElementById('txtFI').value='';document.getElementById('imgFI').value='';}
+async function delArt(id,title){if(!confirm(`Delete "${title}"?`))return;try{await NW.deleteArticle(id);toast('Deleted.','ok');loadArts();loadDash();}catch(e){toast(e.message,'err');}}
+
+// ── TOAST ──
+let tt;
+function toast(m,type='ok'){clearTimeout(tt);const t=document.getElementById('toast');t.textContent=m;t.className=`toast ${type}`;t.style.display='block';tt=setTimeout(()=>t.style.display='none',4000);}
+
+// ── BOOT ──
+if(checkAccess()) initAdmin();
+</script>
+</body>
+</html>

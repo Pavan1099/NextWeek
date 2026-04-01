@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Publisher — nextWEEK</title>
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.pub-header{padding:36px 0 24px;border-bottom:3px solid var(--pink);margin-bottom:28px;display:flex;align-items:center;gap:24px;}
+.pub-big-avatar{width:80px;height:80px;border-radius:50%;background:var(--pink);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:900;font-size:32px;color:#fff;flex-shrink:0;}
+.pub-header-info h1{font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,52px);font-weight:900;letter-spacing:-.02em;line-height:1;}
+.pub-header-info h1 span{color:var(--pink);}
+.pub-stats-row{display:flex;gap:20px;margin-top:10px;flex-wrap:wrap;}
+.pub-stat{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+.pub-stat strong{color:var(--pink);font-size:14px;}
+.list-item{display:grid;grid-template-columns:160px 1fr;gap:20px;padding:20px 0;border-bottom:1px solid var(--rule);cursor:pointer;text-decoration:none;color:inherit;transition:all .2s;}
+.list-item:hover{background:var(--pink-soft);padding:20px 12px;margin:0 -12px;}
+.list-thumb{height:108px;background:var(--bg2);border:1px solid var(--border);border-top:3px solid var(--pink);display:flex;align-items:center;justify-content:center;font-size:34px;overflow:hidden;}
+.list-thumb img{width:100%;height:100%;object-fit:cover;}
+.list-cat{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--pink);margin-bottom:5px;}
+.list-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;line-height:1.2;margin-bottom:7px;}
+.list-excerpt{font-size:13px;line-height:1.65;color:var(--muted);margin-bottom:8px;}
+.list-meta{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);}
+@media(max-width:700px){.pub-header{flex-direction:column;align-items:flex-start;}.list-item{grid-template-columns:1fr;}.list-thumb{height:170px;}}
+</style>
+</head>
+<body>
+<div id="mh"></div>
+<div class="page-wrap">
+  <div id="ph" class="reveal"></div>
+  <div id="al" class="reveal"><div class="loading"></div></div>
+  <div id="nl" class="reveal"></div>
+</div>
+<div id="ft"></div>
+<script src="/js/api.js"></script>
+<script>
+NW.initTheme();
+var publisherName = decodeURIComponent(new URLSearchParams(location.search).get('name') || '');
+document.title = (publisherName || 'Publisher') + ' — nextWEEK';
+document.getElementById('mh').innerHTML = NW.renderMasthead();
+document.getElementById('ft').innerHTML = NW.renderFooter();
+document.getElementById('nl').innerHTML = NW.renderNewsletter();
+document.getElementById('themeToggleBtn').textContent = NW.getTheme()==='dark'?'☀️':'🌙';
+
+async function load() {
+  if (!publisherName) {
+    document.getElementById('ph').innerHTML = '<div class="empty-state"><h3>No publisher specified</h3><p><a href="/">Go home →</a></p></div>';
+    document.getElementById('al').innerHTML = '';
+    return;
+  }
+  try {
+    var all = await NW.fetchArticles();
+    var arts = all.filter(function(a){ return a.author === publisherName; });
+    var sections = [...new Set(arts.map(function(a){return a.section;}))];
+    var initials = publisherName.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
+
+    document.getElementById('ph').innerHTML =
+      '<div class="pub-header">'
+      + '<div class="pub-big-avatar">'+initials+'</div>'
+      + '<div class="pub-header-info">'
+        + '<h1><span>'+publisherName+'</span></h1>'
+        + '<div class="pub-stats-row">'
+          + '<div class="pub-stat"><strong>'+arts.length+'</strong><br>Article'+( arts.length!==1?'s':'')+'</div>'
+          + '<div class="pub-stat"><strong>'+sections.length+'</strong><br>Section'+( sections.length!==1?'s':'')+' covered</div>'
+          + (arts.length ? '<div class="pub-stat"><strong>'+NW.formatDate(arts[0].dateISO)+'</strong><br>Latest article</div>' : '')
+        + '</div>'
+        + (sections.length ? '<div class="tags" style="margin-top:12px;">'+sections.map(function(s){ return '<a class="tag" href="'+NW.sectionURL(s)+'">'+s+'</a>'; }).join('')+'</div>' : '')
+      + '</div>'
+      + '</div>';
+
+    var al = document.getElementById('al');
+    if (!arts.length) {
+      al.innerHTML = '<div class="empty-state"><h3>No articles yet</h3><p>This publisher hasn\'t published anything.</p></div>';
+    } else {
+      al.innerHTML = '<div style="border-top:1px solid var(--rule);">'
+        + arts.map(function(a) {
+            var th = a.imageUrl
+              ? '<div class="list-thumb"><img src="'+a.imageUrl+'" alt=""></div>'
+              : '<div class="list-thumb">'+(NW.EMOJIS[a.section]||'📰')+'</div>';
+            return '<a class="list-item" href="'+NW.articleURL(a.id)+'">'
+              + th
+              + '<div>'
+                + '<div class="list-cat">'+a.section+' &nbsp;·&nbsp; '+NW.readTime(a.excerpt||'')+'</div>'
+                + '<div class="list-title">'+a.title+'</div>'
+                + '<div class="list-excerpt">'+NW.excerpt(a.excerpt||'',150)+'</div>'
+                + '<div class="list-meta">'+NW.formatDate(a.dateISO)+(a.tags&&a.tags.length?' &nbsp;·&nbsp; '+a.tags.slice(0,3).join(', '):'')+'</div>'
+              + '</div>'
+              + '</a>';
+          }).join('')
+        + '</div>';
+    }
+    NW.initReveal();
+  } catch(e) {
+    document.getElementById('al').innerHTML = '<div class="empty-state"><h3>Error</h3><p>'+e.message+'</p></div>';
+  }
+}
+NW.initTicker();
+load();
+</script>
+</body>
+</html>
