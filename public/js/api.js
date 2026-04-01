@@ -10,7 +10,7 @@ const NW = {
   },
 
   getTheme()    { return localStorage.getItem('nw_theme') || 'light'; },
-  setTheme(t)   { localStorage.setItem('nw_theme',t); document.documentElement.setAttribute('data-theme',t); var btn=document.getElementById('themeToggleBtn'); if(btn) btn.textContent=t==='dark'?'☀️':'🌙'; },
+  setTheme(t)   { localStorage.setItem('nw_theme',t); document.documentElement.setAttribute('data-theme',t); const btn=document.getElementById('themeToggleBtn'); if(btn) btn.textContent=t==='dark'?'☀️':'🌙'; },
   initTheme()   { this.setTheme(this.getTheme()); },
   toggleTheme() { this.setTheme(this.getTheme()==='dark'?'light':'dark'); },
 
@@ -18,7 +18,7 @@ const NW = {
 
   openPublisherSearch: async function() {
     if (!document.getElementById('pubModal')) {
-      var m = document.createElement('div');
+      const m = document.createElement('div');
       m.id = 'pubModal';
       m.style.display = 'none';
       m.innerHTML = '<div id="pubBackdrop" style="position:fixed;inset:0;background:rgba(10,6,18,0.82);z-index:10000;display:flex;align-items:flex-start;justify-content:center;padding:56px 20px 20px;backdrop-filter:blur(4px);" onclick="NW.closePubModal(event)"><div style="background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--pink);width:100%;max-width:540px;max-height:78vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(168,85,200,0.22);animation:pubIn .3s ease;" onclick="event.stopPropagation()"><div style="padding:18px 20px 14px;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;"><div><div style="font-family:Playfair Display,serif;font-size:20px;font-weight:900;color:var(--ink);">Publishers</div><div style="font-family:Space Mono,monospace;font-size:10px;color:var(--muted);margin-top:2px;letter-spacing:.04em;">Sorted by article count</div></div><button onclick="NW.closePubModal()" style="width:30px;height:30px;background:var(--bg2);border:1px solid var(--border);cursor:pointer;font-size:13px;color:var(--muted);">&#x2715;</button></div><div style="padding:12px 20px;border-bottom:1px solid var(--rule);flex-shrink:0;"><div style="position:relative;"><span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none;">🔍</span><input id="pubSearchInput" type="text" placeholder="Search publishers by name…" style="width:100%;padding:9px 12px 9px 34px;background:var(--bg2);border:1px solid var(--border);color:var(--ink);font-family:Space Mono,monospace;font-size:12px;outline:none;transition:border-color .2s;" oninput="NW.filterPub(this.value)" onfocus="this.style.borderColor=\'var(--pink)\'" onblur="this.style.borderColor=\'var(--border)\'"></div></div><div id="pubList" style="overflow-y:auto;flex:1;"></div></div></div><style>@keyframes pubIn{from{transform:translateY(-14px);opacity:0}to{transform:none;opacity:1}}.pub-row{display:flex;align-items:center;gap:14px;padding:13px 20px;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--rule);text-decoration:none;color:inherit;}.pub-row:last-child{border-bottom:none;}.pub-row:hover{background:var(--pink-soft);}.pub-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Playfair Display,serif;font-weight:900;font-size:17px;color:#fff;flex-shrink:0;}</style>';
@@ -32,15 +32,15 @@ const NW = {
 
   closePubModal: function(e) {
     if (e && e.target !== document.getElementById('pubBackdrop')) return;
-    var m = document.getElementById('pubModal');
+    const m = document.getElementById('pubModal');
     if (m) m.style.display = 'none';
   },
 
   loadPub: async function() {
     document.getElementById('pubList').innerHTML = '<div style="text-align:center;padding:40px;font-family:Space Mono,monospace;font-size:12px;color:var(--muted);">Loading…</div>';
     try {
-      var arts = await this.fetchArticles();
-      var map = {};
+      const arts = await this.fetchArticles();
+      const map = {};
       arts.forEach(function(a) {
         if (!map[a.author]) map[a.author] = { name: a.author, count: 0, sections: {}, latest: a.dateISO };
         map[a.author].count++;
@@ -51,20 +51,20 @@ const NW = {
         p.sectionList = Object.keys(p.sections); return p;
       }).sort(function(a,b){ return b.count - a.count; });
       NW.renderPub(NW._allPublishers);
-    } catch(e) {
+    } catch(_e) {
       document.getElementById('pubList').innerHTML = '<div style="text-align:center;padding:40px;font-family:Space Mono,monospace;font-size:12px;color:var(--muted);">Could not load publishers.</div>';
     }
   },
 
   renderPub: function(list) {
-    var el = document.getElementById('pubList');
+    const el = document.getElementById('pubList');
     if (!list.length) { el.innerHTML = '<div style="text-align:center;padding:40px;font-family:Space Mono,monospace;font-size:12px;color:var(--muted);">No publishers found.</div>'; return; }
-    var colors = ['#a855c8','#7c3aed','#6d28d9','#8b3faa','#9333ea'];
+    const colors = ['#a855c8','#7c3aed','#6d28d9','#8b3faa','#9333ea'];
     el.innerHTML = list.map(function(p, i) {
-      var initials = p.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
-      var rank = i+1;
-      var rankLabel = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'#'+rank;
-      var color = colors[i % colors.length];
+      const initials = p.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
+      const rank = i+1;
+      const rankLabel = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'#'+rank;
+      const color = colors[i % colors.length];
       return '<a class="pub-row" href="/publishers.html?name='+encodeURIComponent(p.name)+'" onclick="document.getElementById(\'pubModal\').style.display=\'none\'">'
         + '<div style="width:28px;text-align:center;font-family:Space Mono,monospace;font-size:'+(rank<=3?'16':'11')+'px;color:'+(rank<=3?'var(--pink)':'var(--muted)')+';flex-shrink:0;">'+rankLabel+'</div>'
         + '<div class="pub-av" style="background:'+color+';">'+initials+'</div>'
@@ -81,7 +81,7 @@ const NW = {
   },
 
   filterPub: function(q) {
-    var filtered = q.trim() ? NW._allPublishers.filter(function(p){ return p.name.toLowerCase().indexOf(q.toLowerCase()) !== -1; }) : NW._allPublishers;
+    const filtered = q.trim() ? NW._allPublishers.filter(function(p){ return p.name.toLowerCase().indexOf(q.toLowerCase()) !== -1; }) : NW._allPublishers;
     NW.renderPub(filtered);
   },
 
@@ -95,34 +95,34 @@ const NW = {
   isPublisher() { return this.getRole() === 'publisher' || this.getRole() === 'admin'; },
 
   api: async function(method, path, body, isForm) {
-    var opts = { method: method, headers: {} };
-    var token = this.getToken();
+    const opts = { method: method, headers: {} };
+    const token = this.getToken();
     if (token) opts.headers['x-auth-token'] = token;
     if (body) {
       if (isForm) opts.body = body;
       else { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
     }
-    var res = await fetch(path, opts);
-    if (!res.ok) { var err = await res.json().catch(function(){return {error:res.statusText};}); throw new Error(err.error || 'HTTP '+res.status); }
+    const res = await fetch(path, opts);
+    if (!res.ok) { const err = await res.json().catch(function(){return {error:res.statusText};}); throw new Error(err.error || 'HTTP '+res.status); }
     return res.json();
   },
 
-  login: async function(u,p) { var d = await this.api('POST','/api/login',{username:u,password:p}); if(d.ok) this.setSession(d.token,d.role,d.name); return d; },
-  register: async function(fd) { return this.api('POST','/api/register',fd,true); },
-  fetchArticles: async function(s) { return this.api('GET','/api/articles'+(s?'?section='+encodeURIComponent(s):'')); },
-  fetchArticle: async function(id) { return this.api('GET','/api/articles/'+id); },
-  fetchSections: async function() { return this.api('GET','/api/sections'); },
-  publishArticle: async function(fd) { return this.api('POST','/api/articles',fd,true); },
-  deleteArticle: async function(id) { return this.api('DELETE','/api/articles/'+id); },
-  fetchStats: async function() { return this.api('GET','/api/stats'); },
-  fetchUsers: async function() { return this.api('GET','/api/users'); },
-  fetchPending: async function() { return this.api('GET','/api/users/pending'); },
-  approveUser: async function(id) { return this.api('POST','/api/users/'+id+'/approve'); },
-  rejectUser: async function(id) { return this.api('POST','/api/users/'+id+'/reject'); },
-  deleteUser: async function(id) { return this.api('DELETE','/api/users/'+id); },
-  createUser: async function(d) { return this.api('POST','/api/users',d); },
-  fetchTxtFiles: async function() { return this.api('GET','/api/txt-files'); },
-  fetchTxtContent: async function(f) { var res = await fetch('/api/txt-files/'+encodeURIComponent(f),{headers:{'x-auth-token':this.getToken()}}); return res.text(); },
+  login: async function(u,p) { const d = await this.api('POST','/api/login',{username:u,password:p}); if(d.ok) this.setSession(d.token,d.role,d.name); return d; },
+  register: function(fd) { return this.api('POST','/api/register',fd,true); },
+  fetchArticles: function(s) { return this.api('GET','/api/articles'+(s?'?section='+encodeURIComponent(s):'')); },
+  fetchArticle: function(id) { return this.api('GET','/api/articles/'+id); },
+  fetchSections: function() { return this.api('GET','/api/sections'); },
+  publishArticle: function(fd) { return this.api('POST','/api/articles',fd,true); },
+  deleteArticle: function(id) { return this.api('DELETE','/api/articles/'+id); },
+  fetchStats: function() { return this.api('GET','/api/stats'); },
+  fetchUsers: function() { return this.api('GET','/api/users'); },
+  fetchPending: function() { return this.api('GET','/api/users/pending'); },
+  approveUser: function(id) { return this.api('POST','/api/users/'+id+'/approve'); },
+  rejectUser: function(id) { return this.api('POST','/api/users/'+id+'/reject'); },
+  deleteUser: function(id) { return this.api('DELETE','/api/users/'+id); },
+  createUser: function(d) { return this.api('POST','/api/users',d); },
+  fetchTxtFiles: function() { return this.api('GET','/api/txt-files'); },
+  fetchTxtContent: async function(f) { const res = await fetch('/api/txt-files/'+encodeURIComponent(f),{headers:{'x-auth-token':this.getToken()}}); return res.text(); },
 
   readTime: function(body) { body=body||''; return Math.max(1,Math.round(body.split(/\s+/).length/200))+' min read'; },
   excerpt: function(t,n) { n=n||180; return t.length>n ? t.slice(0,n).trimEnd()+'…' : t; },
@@ -133,19 +133,18 @@ const NW = {
   logout: function() { this.clearSession(); location.href='/'; },
 
   subscribe: function() {
-    var v = (document.getElementById('nlEmail')||{}).value||'';
+    const v = (document.getElementById('nlEmail')||{}).value||'';
     if(!v.includes('@')){ alert('Please enter a valid email.'); return; }
     alert('✓ Subscribed!'); document.getElementById('nlEmail').value='';
   },
 
   renderMasthead: function(activeSection) {
     activeSection = activeSection || '';
-    var today = new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-    var self = this;
-    var navLinks = this.SECTIONS.map(function(s){ return '<a href="'+self.sectionURL(s)+'" '+(activeSection===s?'class="active-section"':'')+'>'+( self.EMOJIS[s]||'')+' '+s+'</a>'; }).join('');
-    var rightHTML = '';
+    const today = new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    const navLinks = this.SECTIONS.map((s) => '<a href="'+this.sectionURL(s)+'" '+(activeSection===s?'class="active-section"':'')+'>'+( this.EMOJIS[s]||'')+' '+s+'</a>').join('');
+    let rightHTML = '';
     if (this.isLoggedIn()) {
-      var role = this.getRole(), name = this.getName();
+      const role = this.getRole(), name = this.getName();
       rightHTML = '<span class="user-chip">'+name+' <span class="role-badge '+role+'">'+role+'</span> <a href="#" onclick="NW.logout();return false;" style="color:var(--muted);font-size:9px;">logout</a></span>'
         + (this.isPublisher() ? '<a href="/admin.html" class="admin-link">⚙ CMS</a>' : '');
     } else {
@@ -162,8 +161,7 @@ const NW = {
   },
 
   renderFooter: function() {
-    var self = this;
-    var sectionLinks = this.SECTIONS.map(function(s){ return '<li><a href="'+self.sectionURL(s)+'">'+s+'</a></li>'; }).join('');
+    const sectionLinks = this.SECTIONS.map((s) => '<li><a href="'+this.sectionURL(s)+'">'+s+'</a></li>').join('');
     return '<footer><div class="footer-grid"><div class="footer-brand"><a href="/" style="text-decoration:none;display:inline-flex;align-items:center;gap:14px;">'+this.logoSVG(52)+'<div style="font-family:Playfair Display,serif;font-size:26px;font-weight:900;letter-spacing:-0.02em;"><span style="color:var(--pink)">next</span>WEEK</div></a><p>An independent opinion publication from Hyderabad.</p><div class="footer-social"><a href="#">X</a><a href="#">IN</a><a href="#">YT</a><a href="#">WA</a></div></div><div class="footer-col"><h4>Sections</h4><ul>'+sectionLinks+'</ul></div><div class="footer-col"><h4>Publication</h4><ul><li><a href="#">About Us</a></li><li><a href="/login.html">Sign In</a></li><li><a href="/register.html">Become a Publisher</a></li><li><a href="#">Contact</a></li></ul></div><div class="footer-col"><h4>Subscribe</h4><ul><li><a href="#">Newsletter</a></li><li><a href="#">Print Edition</a></li><li><a href="#">Podcast</a></li><li><a href="#">RSS Feed</a></li></ul></div></div><div class="footer-bottom"><span>© '+new Date().getFullYear()+' nextWEEK. All opinions reserved. Hyderabad, India.</span><span><a href="#">Privacy</a> &nbsp;·&nbsp; <a href="#">Terms</a> &nbsp;·&nbsp; write@nextweek.in</span></div></footer>';
   },
 
@@ -172,29 +170,28 @@ const NW = {
   },
 
   initTicker: async function() {
-    var track = document.getElementById('tickerTrack');
+    const track = document.getElementById('tickerTrack');
     if (!track) return;
     try {
-      var arts = await this.fetchArticles();
-      var items = arts.length ? arts.slice(0,8).map(function(a){return a.title;}) : ['Welcome to nextWEEK — Independent opinion from Hyderabad'];
-      var html = items.map(function(t){return '<span>'+t+'</span>';}).join('');
+      const arts = await this.fetchArticles();
+      const items = arts.length ? arts.slice(0,8).map(function(a){return a.title;}) : ['Welcome to nextWEEK — Independent opinion from Hyderabad'];
+      const html = items.map(function(t){return '<span>'+t+'</span>';}).join('');
       track.innerHTML = html + html;
-    } catch(e) { track.innerHTML = '<span>nextWEEK — Opinions that bite back</span><span>nextWEEK — Opinions that bite back</span>'; }
+    } catch(_e) { track.innerHTML = '<span>nextWEEK — Opinions that bite back</span><span>nextWEEK — Opinions that bite back</span>'; }
   },
 
   initReveal: function() {
-    var obs = new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.08});
+    const obs = new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.08});
     document.querySelectorAll('.reveal').forEach(function(el){obs.observe(el);});
   },
 
   renderCard: function(art, size) {
     size = size || 'normal';
-    var self = this;
-    var emoji = this.EMOJIS[art.section] || '📰';
-    var thumb = art.imageUrl
+    const emoji = this.EMOJIS[art.section] || '📰';
+    const thumb = art.imageUrl
       ? '<div style="background:url(\''+art.imageUrl+'\') center/cover;width:100%;height:300px;border:1px solid var(--border);margin-bottom:18px;"></div>'
       : '<div style="width:100%;height:300px;border:1px solid var(--border);margin-bottom:18px;background:linear-gradient(135deg,#3d1a5e,#a855c8);display:flex;align-items:center;justify-content:center;font-size:72px;">'+emoji+'</div>';
-    var sthumb = art.imageUrl
+    const sthumb = art.imageUrl
       ? '<div style="width:64px;height:64px;flex-shrink:0;overflow:hidden;border:1px solid var(--border);"><img src="'+art.imageUrl+'" style="width:100%;height:100%;object-fit:cover;" alt=""></div>'
       : '<div style="width:64px;height:64px;flex-shrink:0;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;">'+emoji+'</div>';
 
