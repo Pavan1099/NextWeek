@@ -6,6 +6,7 @@ const fs      = require('fs');
 const { v4: uuidv4 } = require('uuid');
 
 const app  = express();
+// deno-lint-ignore no-node-globals
 const PORT = process.env.PORT || 3000;
 
 const DATA_DIR     = path.join(__dirname, 'data');
@@ -49,12 +50,12 @@ app.use('/aadhaar', express.static(AADHAAR_DIR)); // served for admin preview
 
 // ── MULTER FACTORIES ──
 function makeDiskStorage(destDir, nameFn) {
-  return multer.diskStorage({ destination: (r,f,cb)=>cb(null,destDir), filename: nameFn });
+  return multer.diskStorage({ destination: (_r,_f,cb)=>cb(null,destDir), filename: nameFn });
 }
 const aadhaarUpload = multer({
-  storage: makeDiskStorage(AADHAAR_DIR, (r,f,cb)=>cb(null,`${Date.now()}-${f.originalname}`)),
+  storage: makeDiskStorage(AADHAAR_DIR, (_r,f,cb)=>cb(null,`${Date.now()}-${f.originalname}`)),
   limits: { fileSize: 8*1024*1024 },
-  fileFilter: (r,f,cb) => cb(null, /pdf|jpeg|jpg|png/i.test(f.mimetype))
+  fileFilter: (_r,f,cb) => cb(null, /pdf|jpeg|jpg|png/i.test(f.mimetype))
 });
 
 // ── AUTH MIDDLEWARE ──
@@ -141,7 +142,7 @@ app.post('/api/articles', requireApprovedPublisher, (req, res, next) => {
   multer({
     storage: makeDiskStorage(
       UPLOADS_DIR,
-      (r, f, cb) => { const e = path.extname(f.originalname); cb(null, `${Date.now()}${e}`); }
+      (_r, f, cb) => { const e = path.extname(f.originalname); cb(null, `${Date.now()}${e}`); }
     ),
     limits: { fileSize: 5*1024*1024 }
   }).fields([{ name:'txtFile', maxCount:1 }, { name:'imageFile', maxCount:1 }])(req, res, err => {
@@ -171,8 +172,8 @@ app.delete('/api/articles/:id', requireApprovedPublisher, (req, res) => {
   const idx  = arts.findIndex(a => a.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'Not found' });
   const art = arts[idx];
-  if (art.txtFileName) try { fs.unlinkSync(path.join(ARTICLES_DIR, art.txtFileName)); } catch {}
-  if (art.imageUrl)    try { fs.unlinkSync(path.join(__dirname, art.imageUrl)); }       catch {}
+  if (art.txtFileName) try { fs.unlinkSync(path.join(ARTICLES_DIR, art.txtFileName)); } catch (_e) {}
+  if (art.imageUrl)    try { fs.unlinkSync(path.join(__dirname, art.imageUrl)); }       catch (_e) {}
   arts.splice(idx, 1); writeArticles(arts);
   res.json({ ok: true });
 });
@@ -182,13 +183,13 @@ app.delete('/api/articles/:id', requireApprovedPublisher, (req, res) => {
 // ══════════════════════════════════════
 
 // All users
-app.get('/api/users', requireAdmin, (req, res) => {
-  res.json(readUsers().map(({ password, ...u }) => u));
+app.get('/api/users', requireAdmin, (_req, res) => {
+  res.json(readUsers().map(({ password: _password, ...u }) => u));
 });
 
 // Pending publisher approvals
-app.get('/api/users/pending', requireAdmin, (req, res) => {
-  res.json(readUsers().filter(u => u.role === 'publisher' && u.status === 'pending').map(({ password, ...u }) => u));
+app.get('/api/users/pending', requireAdmin, (_req, res) => {
+  res.json(readUsers().filter(u => u.role === 'publisher' && u.status === 'pending').map(({ password: _password, ...u }) => u));
 });
 
 // Approve a publisher
@@ -236,14 +237,14 @@ app.post('/api/users', requireAdmin, (req, res) => {
 // ══════════════════════════════════════
 //  MISC
 // ══════════════════════════════════════
-app.get('/api/sections', (req, res) => {
+app.get('/api/sections', (_req, res) => {
   const arts = readArticles();
   const SECTIONS = ['Opinion','Politics','Food & Society','Culture','Health','Economy','History','Diaspora','Tech'];
   const counts = {}; SECTIONS.forEach(s => counts[s] = arts.filter(a => a.section === s).length);
   res.json({ sections: SECTIONS, counts });
 });
 
-app.get('/api/stats', requireApprovedPublisher, (req, res) => {
+app.get('/api/stats', requireApprovedPublisher, (_req, res) => {
   const arts  = readArticles();
   const users = readUsers();
   res.json({
@@ -256,7 +257,7 @@ app.get('/api/stats', requireApprovedPublisher, (req, res) => {
   });
 });
 
-app.get('/api/txt-files', requireApprovedPublisher, (req, res) => {
+app.get('/api/txt-files', requireApprovedPublisher, (_req, res) => {
   const files = fs.readdirSync(ARTICLES_DIR).filter(f=>f.endsWith('.txt'))
     .map(f => ({ filename:f, size: fs.statSync(path.join(ARTICLES_DIR,f)).size, modified: fs.statSync(path.join(ARTICLES_DIR,f)).mtime }));
   res.json(files);
@@ -268,7 +269,7 @@ app.get('/api/txt-files/:filename', requireApprovedPublisher, (req, res) => {
   res.send(fs.readFileSync(p,'utf8'));
 });
 
-app.get('*', (req, res) => res.sendFile(path.join(__dirname,'public','index.html')));
+app.get('*', (_req, res) => res.sendFile(path.join(__dirname,'public','index.html')));
 
 app.listen(PORT, () => {
   console.log(`\n  ◆ nextWEEK CMS v3  →  http://localhost:${PORT}`);
