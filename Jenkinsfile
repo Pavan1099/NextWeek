@@ -13,6 +13,15 @@ pipeline {
                 echo "Testing..."
             }
         }
+        stage('VA Scan - Trivy') {
+            steps {
+                sh '''
+                trivy fs --exit-code 1 \
+                --severity HIGH,CRITICAL \
+                --format table .
+                '''
+            }
+        }
     }
 
     post {
