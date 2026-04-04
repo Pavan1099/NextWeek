@@ -6,7 +6,7 @@ const fs      = require('fs');
 const { v4: uuidv4 } = require('uuid');
 
 const app  = express();
-// deno-lint-ignore no-process-global
+const process = require('process');
 const PORT = process.env.PORT || 3000;
 
 const DATA_DIR     = path.join(__dirname, 'data');
