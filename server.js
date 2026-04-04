@@ -172,8 +172,8 @@ app.delete('/api/articles/:id', requireApprovedPublisher, (req, res) => {
   const idx  = arts.findIndex(a => a.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'Not found' });
   const art = arts[idx];
-  if (art.txtFileName) try { fs.unlinkSync(path.join(ARTICLES_DIR, art.txtFileName)); } catch (_e) { /* ignore */ }
-  if (art.imageUrl)    try { fs.unlinkSync(path.join(__dirname, art.imageUrl)); }       catch (_e) { /* ignore */ }
+  if (art.txtFileName) try { fs.unlinkSync(path.join(ARTICLES_DIR, art.txtFileName)); } catch (_e) { void _e; }
+  if (art.imageUrl)    try { fs.unlinkSync(path.join(__dirname, art.imageUrl)); }       catch (_e) { void _e; }
   arts.splice(idx, 1); writeArticles(arts);
   res.json({ ok: true });
 });
