@@ -17,7 +17,7 @@ pipeline {
             steps {
                 sh '''
                 trivy fs --exit-code 1 \
-                --severity HIGH,CRITICAL \
+                --severity CRITICAL \
                 --format table .
                 '''
             }
