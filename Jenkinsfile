@@ -26,10 +26,10 @@ pipeline {
 
     post {
         success {
-            echo "Build Success"
+            echo "Build Success great!!!"
         }
         failure {
-            echo "Build Failed"
+            echo "Build Failed noob!!!"
         }
     }
 }
